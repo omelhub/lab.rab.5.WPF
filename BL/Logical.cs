@@ -33,7 +33,7 @@ internal class Logical : INotifyPropertyChanged
             ShowingDisciplines.Add((Discipline)discipline);
         }
 
-        NewDiscipline = new();
+        //NewDiscipline = new();
 
         ChangeStatusCommand = new RelayCommand(ChangeStatus);
         DeleteDisciplineCommand = new RelayCommand(DeleteDiscipline);
@@ -109,15 +109,18 @@ public List<bool> Statuses { get; set; } = new()
                 break;
             }
         }
-        //Display();
-        //SelectedDiscipline.Status = !SelectedDiscipline.Status;
-        //Disciplines.Clear();
-        //SelectedDisciplines.Clear();
-        //foreach (Discipline discipline in ShowingDisciplines)
-        //{
-        //    Disciplines.Add(discipline);
-        //    SelectedDisciplines.Add(discipline);
-        //}
+        foreach (Discipline discipline in ShowingDisciplines)
+        {
+            if (discipline.Equals(SelectedDiscipline))
+            {
+                if (a)
+                    discipline.Status = !discipline.Status;
+                else
+                    SelectedDisciplines.Remove(discipline);
+                break;
+            }
+        }
+        Display();
     }
 
     private void DeleteDiscipline()
