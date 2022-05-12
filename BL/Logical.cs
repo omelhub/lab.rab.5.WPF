@@ -16,6 +16,8 @@ internal class Logical : INotifyPropertyChanged
 {
     public Logical()
     {
+        ReadFromFile();
+
         Disciplines.Add(new Discipline() { Name = "ВВПД", Status = false });
         Disciplines.Add(new Discipline() { Name = "Высшая математика", Status = false });
         Disciplines.Add(new Discipline() { Name = "Дискретная математика", Status = false });
@@ -37,6 +39,7 @@ internal class Logical : INotifyPropertyChanged
 
         ChangeStatusCommand = new RelayCommand(ChangeStatus);
         DeleteDisciplineCommand = new RelayCommand(DeleteDiscipline);
+        SaveCommand = new RelayCommand(Save);
         DisplayCommand = new RelayCommand(Display);
         AddDisciplineCommand = new RelayCommand(AddDiscipline);
         SortingAllCommand = new RelayCommand(SortingAll);
@@ -96,7 +99,7 @@ public List<bool> Statuses { get; set; } = new()
             else
                 n = true;
         }
-        if ((d && n)) // | (!d && !n)
+        if ((d && n) | (!d && !n))
             a = true;
         foreach (Discipline discipline in SelectedDisciplines)
         {
@@ -130,20 +133,37 @@ public List<bool> Statuses { get; set; } = new()
         ShowingDisciplines.Remove(SelectedDiscipline);
     }
 
-    //private void Save()
-    //{
-    //    SaveFileDialog file = new SaveFileDialog();
-    //    file.DefaultExt = ".txt";
-    //    file.Filter = "Test files|*.txt";
-    //    if (file.ShowDialog == System.Windows.Forms.DialogResult.OK && file.FileName.Length > 0)
-    //    {
-    //        using (StreamWriter sw = new(file.FileName, true))
-    //        {
-    //            sw.WriteLine(MainWindow.Subj Subjects.Text);
-    //            sw.Close();
-    //        }
-    //    }
-    //}
+    private const string Path = "disciplines.txt";
+    private void Save()
+    {
+        string buffer = string.Empty;
+        foreach (Discipline discipline in Disciplines)
+        {
+            buffer += $"{discipline.Name},{discipline.Status}\n";
+        }
+        File.WriteAllText(Path, buffer);
+    }
+
+    private void ReadFromFile()
+    {
+        if (!File.Exists(Path))
+        {
+            return;
+        }
+
+        Disciplines.Clear();
+        var buffer = File.ReadAllLines(Path);
+        foreach (var x in buffer)
+        {
+            if (x == null)
+            {
+                continue;
+            }
+
+            var split = x.Split(",");
+            Disciplines.Add(new Discipline() { Name = split[0], Status = Convert.ToBoolean(split[1]) });
+        }
+    }
 
     private void Display()
     {
@@ -218,3 +238,4 @@ public List<bool> Statuses { get; set; } = new()
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyname));
     }
 }
+
